@@ -1,0 +1,30 @@
+{
+  "name": "e-learning",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "PORT=3000 node bin/www",
+    "dev": "./node_modules/.bin/nodemon bin/www",
+    "prd": "pm2 start bin/www --watch",
+    "prs": "pm2 stop all",
+    "plog": "pm2 log",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "debug": "^2.6.3",
+    "koa": "^2.4.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-convert": "^1.2.0",
+    "koa-json": "^2.0.2",
+    "koa-logger": "^3.1.0",
+    "koa-onerror": "^1.2.1",
+    "koa-router": "^7.4.0",
+    "koa-static": "^4.0.2",
+    "koa-views": "^6.1.3",
+    "mongoose": "^5.0.3",
+    "pug": "^2.0.0-rc.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.8.1"
+  }
+}
