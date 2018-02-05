@@ -5,9 +5,9 @@
   "scripts": {
     "start": "PORT=3000 node bin/www",
     "dev": "./node_modules/.bin/nodemon bin/www",
-    "prd": "pm2 start bin/www --watch",
-    "prs": "pm2 stop all",
-    "plog": "pm2 log",
+    "pm2-dev": "pm2 start bin/www --watch",
+    "pm2-stop": "pm2 stop all",
+    "pm2-log": "pm2 log",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

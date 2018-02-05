@@ -1,13 +1,13 @@
 const router = require('koa-router')()
 
 // 路由前缀 prefix
-router.prefix('/students')
+router.prefix('api/v1/students')
 
-router.get('/', function (ctx, next) {
+router.get('/', async (ctx, next) => {
   ctx.body = 'this is a students response!'
 })
 
-router.get('/:id', function (ctx, next) {
+router.get('/:id', async (ctx, next) => {
   ctx.body = 'this is a students/bar response'
 })
 
