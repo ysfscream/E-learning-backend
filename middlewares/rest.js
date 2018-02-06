@@ -3,20 +3,20 @@ module.exports = {
   restify: () => {
     return async (ctx, next) => {
       ctx.rest = (status, message, data, meta = {}) => {
-        ctx.type = 'application/json'
-        ctx.status = status        
-        ctx.body = {
-          status,
-          message,
-          meta,
-          data,
+        ctx.response.type = 'application/json'
+        ctx.response.status = status        
+        ctx.body = { 
+          status, 
+          message, 
+          meta, 
+          items: data 
         }
       }
       try{
         await next()
       } catch(error) {
-        ctx.type = 'application/json'        
-        ctx.status = error.status
+        ctx.response.type = 'application/json'        
+        ctx.response.status = error.status
         ctx.body = {
           status: error.status,
           message: error.message,

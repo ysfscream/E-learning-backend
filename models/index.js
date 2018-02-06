@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { mongo } = require('../config/config')
+const { mongo } = require('../config')
 const schema = mongoose.Schema
 
 const mongodbConnect = () => {
