@@ -16,10 +16,10 @@ npm run dev && yarn dev
 npm start && yarn start
 
 #pm2 🏃‍♀️运行程序 localhost:3333 pm2 log 打印日志
-npm pm2-dev && yarn pm2-stop
+npm pm2-dev && yarn pm2-dev
 
 #pm2 🙅‍♀️停止程序 localhost:3333 pm2 log 打印日志
-npm pm2-dev && yarn pm2-stop
+npm pm2-stop && yarn pm2-stop
 
 #💻 运行测试
 npm test
