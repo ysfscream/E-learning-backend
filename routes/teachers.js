@@ -1,5 +1,6 @@
 const router = require('koa-router')()
 const Teachers = require('../models/Schema/teacherSchema')
+const bcrypt = require('bcrypt')
 
 // 路由前缀 prefix
 router.prefix('/api/v1/teachers')
@@ -20,24 +21,29 @@ router.post('/login', async (ctx, next) => {
     email: ctx.request.body.email,
     password: ctx.request.body.password
   }
-  const loginInfo = await Teachers.findOne(teacherParam)
+  const loginInfo = await Teachers.findOne({email: teacherParam.email})
   if (loginInfo) {
-    const teacher = {
-      id: loginInfo._id,
-      role: loginInfo.role,
-      teacherName: loginInfo.teacherName,
+    if (await bcrypt.compare(teacherParam.password, loginInfo.password)) {
+      const teacher = {
+        id: loginInfo._id,
+        role: loginInfo.role,
+        teacherName: loginInfo.teacherName,
+      }
+      ctx.rest(200, '登录成功', teacher)
+    } else {
+      ctx.throw(404, '登录失败，密码错误')
     }
-    ctx.rest(200, '登录成功', teacher)
   } else {
-    ctx.throw(404, '登录失败，用户名或密码错误')
+    ctx.throw(404, '登录失败，邮箱错误')
   }
 })
 
 router.post('/register', async (ctx, next) => {
+  let encryptionPassword = await bcrypt.hash(ctx.request.body.password, 10)
   const teacherParam = {
     email: ctx.request.body.email,
     teacherName: ctx.request.body.teacherName,
-    password: ctx.request.body.password,
+    password: encryptionPassword,
   }
   const teacherEmail = await Teachers.findOne({ email: teacherParam.email })
   if (!teacherEmail) {
