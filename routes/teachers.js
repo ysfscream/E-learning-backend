@@ -1,9 +1,12 @@
 const router = require('koa-router')()
 const Teachers = require('../models/Schema/teacherSchema')
 const bcrypt = require('bcrypt')
+const jsonwebtoken = require('jsonwebtoken')
+
+const config = require('../config')
 
 // 路由前缀 prefix
-router.prefix('/api/v1/teachers')
+router.prefix(`${config.apiVersion}/teachers`)
 
 router.get('/', async (ctx, next) => {
   const teachers = await Teachers.find({})
@@ -28,6 +31,13 @@ router.post('/login', async (ctx, next) => {
         id: loginInfo._id,
         role: loginInfo.role,
         teacherName: loginInfo.teacherName,
+        token: jsonwebtoken.sign({
+          data: {
+            id: loginInfo.teacherID,            
+            teacherName: loginInfo.teacherName,            
+          },
+          exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
+        }, config.secret),
       }
       ctx.rest(200, '登录成功', teacher)
     } else {

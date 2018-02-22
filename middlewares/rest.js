@@ -12,7 +12,7 @@ module.exports = {
           items: data 
         }
       }
-      try{
+      try {
         await next()
       } catch(error) {
         ctx.response.type = 'application/json'        
@@ -23,5 +23,5 @@ module.exports = {
         }
       }
     }
-  }
+  },
 }

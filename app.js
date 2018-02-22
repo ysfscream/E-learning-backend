@@ -5,6 +5,7 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
+const jwt = require('koa-jwt')
 
 const logs = require('./middlewares/logs')
 const rest = require('./middlewares/rest')
@@ -13,10 +14,11 @@ const index = require('./routes/index')
 const students = require('./routes/students')
 const teachers = require('./routes/teachers')
 
+const config = require('./config')
 const mongodbConnect = require('./models')
 
 // connect mongodb 连接数据库
-mongodbConnect()
+mongodbConnect(config.mongo)
 
 // error handler  app错误处理
 onerror(app)
@@ -38,6 +40,13 @@ app.use(rest.restify())
 
 // logger 日志
 app.use(logs())
+
+// jwt验证 路由是否有 token 权限
+app.use(jwt({
+  secret: config.secret
+}).unless({
+  path: [/\/login/, /\/register/] // 不需要验证的路由
+}))
 
 // routes 路由
 app.use(index.routes(), index.allowedMethods())
