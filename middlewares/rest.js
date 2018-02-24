@@ -14,7 +14,7 @@ module.exports = {
       }
       try {
         await next()
-      } catch(error) {
+      } catch (error) {
         ctx.response.type = 'application/json'        
         ctx.response.status = error.status
         ctx.body = {

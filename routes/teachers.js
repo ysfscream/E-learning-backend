@@ -8,17 +8,32 @@ const config = require('../config')
 // 路由前缀 prefix
 router.prefix(`${config.apiVersion}/teachers`)
 
+// 获取教师信息
 router.get('/', async (ctx, next) => {
   const teachers = await Teachers.find({})
   if (teachers) {
-    ctx.rest(200, 'find success', {
+    ctx.rest(200, '数据获取成功', {
       teachers
     })
   } else {
-    ctx.throw(404, 'find fail')
+    ctx.throw(404, '数据获取失败')
   }
 })
 
+// 获取单个教师信息
+router.get('/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const teacher = await Teachers.findOne({ _id: id })
+  if (teacher) {
+    ctx.rest(200, '数据获取成功', {
+      teacher
+    })
+  } else {
+    ctx.throw(404, '数据获取失败')
+  }
+})
+
+// 教师登录
 router.post('/login', async (ctx, next) => {
   const teacherParam = {
     email: ctx.request.body.email,
@@ -27,14 +42,16 @@ router.post('/login', async (ctx, next) => {
   const loginInfo = await Teachers.findOne({email: teacherParam.email})
   if (loginInfo) {
     if (await bcrypt.compare(teacherParam.password, loginInfo.password)) {
-      const teacher = {
+      const teacherData = {
         id: loginInfo._id,
         role: loginInfo.role,
         teacherName: loginInfo.teacherName,
+      }
+      const teacher = {
+        ...teacherData,
         token: jsonwebtoken.sign({
           data: {
-            id: loginInfo.teacherID,            
-            teacherName: loginInfo.teacherName,            
+            ...teacherData,            
           },
           exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
         }, config.secret),
@@ -48,6 +65,7 @@ router.post('/login', async (ctx, next) => {
   }
 })
 
+// 教师注册
 router.post('/register', async (ctx, next) => {
   let encryptionPassword = await bcrypt.hash(ctx.request.body.password, 10)
   const teacherParam = {
@@ -68,6 +86,20 @@ router.post('/register', async (ctx, next) => {
     ctx.rest(201, '注册成功')
   } else {
     ctx.throw(400, '注册失败')
+  }
+})
+
+// 修改教师信息
+router.put('/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const teacherForm = ctx.request.body
+  const editTeacher = await Teachers.update({ _id: id }, {
+    $set: teacherForm
+  })
+  if (editTeacher) {
+    ctx.rest(201, '修改成功')
+  } else {
+    ctx.throw(400, '修改失败')
   }
 })
 
