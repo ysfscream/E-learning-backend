@@ -90,7 +90,7 @@ router.post('/register', async (ctx, next) => {
 })
 
 // 修改教师信息
-router.put('/:id', async (ctx, next) => {
+router.put('/info/:id', async (ctx, next) => {
   const id = ctx.params.id
   const teacherForm = ctx.request.body
   const editTeacher = await Teachers.update({ _id: id }, {
@@ -100,6 +100,30 @@ router.put('/:id', async (ctx, next) => {
     ctx.rest(201, '修改成功')
   } else {
     ctx.throw(400, '修改失败')
+  }
+})
+
+// 修改教师密码
+router.put('/password/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const teacherPasswordForm = ctx.request.body
+  const teacherForm = await Teachers.findOne({ _id: id })
+  console.log(teacherForm)
+  const passwordRight = await bcrypt.compare(teacherPasswordForm.oldPassword, teacherForm.password)
+  if (passwordRight) {
+    let encryptionPassword = await bcrypt.hash(teacherPasswordForm.password, 10)
+    const changePassword = await Teachers.update({ _id: id }, {
+      $set: {
+        password: encryptionPassword,
+      }
+    })
+    if (changePassword) {
+      ctx.rest(201, '修改成功')
+    } else {
+      ctx.rest(201, '修改失败')      
+    }
+  } else {
+    ctx.rest(404, '旧密码错误')
   }
 })
 
