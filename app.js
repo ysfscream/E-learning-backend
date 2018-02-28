@@ -10,10 +10,7 @@ const jwt = require('koa-jwt')
 const logs = require('./middlewares/logs')
 const rest = require('./middlewares/rest')
 
-const index = require('./routes/index')
-const students = require('./routes/students')
-const teachers = require('./routes/teachers')
-const departments = require('./routes/departments')
+const { routers } = require('./routes')
 
 const config = require('./config')
 const mongodbConnect = require('./models')
@@ -50,10 +47,9 @@ app.use(jwt({
 }))
 
 // routes 路由
-app.use(index.routes(), index.allowedMethods())
-app.use(students.routes(), students.allowedMethods())
-app.use(teachers.routes(), teachers.allowedMethods())
-app.use(departments.routes(), departments.allowedMethods())
+routers.map((routerItem) => {
+  app.use(routerItem.router, routerItem.allowedMethods)
+})
 
 // error-handling 错误处理
 app.on('error', (err, ctx) => {
