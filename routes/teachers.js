@@ -13,7 +13,7 @@ router.get('/', async (ctx, next) => {
   const teachers = await Teachers.find({})
   if (teachers) {
     ctx.rest(200, '数据获取成功', {
-      teachers
+      teacher
     })
   } else {
     ctx.throw(404, '数据获取失败')

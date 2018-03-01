@@ -6,6 +6,7 @@ const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 const jwt = require('koa-jwt')
+const serve = require('koa-static')
 
 const logs = require('./middlewares/logs')
 const rest = require('./middlewares/rest')
@@ -43,8 +44,11 @@ app.use(logs())
 app.use(jwt({
   secret: config.secret
 }).unless({
-  path: [/\/login/, /\/register/] // 不需要验证的路由
+  path: [/\/login/, /\/register/, /\/public/] // 不需要验证的路由
 }))
+
+// 显示静态文件
+app.use(serve(__dirname, '/public'))
 
 // routes 路由
 routers.map((routerItem) => {
