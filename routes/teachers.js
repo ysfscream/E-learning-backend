@@ -101,7 +101,7 @@ router.put('/info/:id', async (ctx, next) => {
   const editTeacher = await Teachers.update({ _id: id }, {
     $set: teacherForm
   })
-  if (editTeacher.ok) {
+  if (editTeacher.n) {
     ctx.rest(201, '修改成功')
   } else {
     ctx.throw(400, '修改失败')
@@ -121,7 +121,7 @@ router.put('/password/:id', async (ctx, next) => {
         password: encryptionPassword,
       }
     })
-    if (changePassword.ok) {
+    if (changePassword.n) {
       ctx.rest(201, '修改成功')
     } else {
       ctx.throw(400, '修改失败')
@@ -159,7 +159,7 @@ router.put('/createShare/:id', async (ctx, next) => {
         share: shareList,
       }
     })
-    if (shareSuccess.ok) {
+    if (shareSuccess.n) {
       ctx.rest(201, '创建成功')
     } else {
       ctx.throw(400, '创建失败')
@@ -180,7 +180,7 @@ router.put('/createShare/:id', async (ctx, next) => {
         share: teacher.share,
       }
     })
-    if (shareSuccess.ok) {
+    if (shareSuccess.n) {
       ctx.rest(201, '创建成功')
     } else {
       ctx.throw(400, '创建失败')
@@ -199,7 +199,7 @@ router.put('/updateShare/:id', async (ctx, next) => {
         share: shareParams,
       }
     })
-    if (shareSuccess.ok) {
+    if (shareSuccess.n) {
       ctx.rest(201, '修改成功')
     } else {
       ctx.throw(400, '修改失败')
@@ -220,7 +220,7 @@ router.delete('/deleteShare/:id', async (ctx, next) => {
           share: currentShare
         }
       })
-      if (deleteShare.ok) {
+      if (deleteShare.n) {
         ctx.rest(201, '删除成功')
       } else {
         ctx.throw(400, '删除失败')
