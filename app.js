@@ -5,18 +5,19 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
+const jwt = require('koa-jwt')
+const serve = require('koa-static')
 
 const logs = require('./middlewares/logs')
 const rest = require('./middlewares/rest')
 
-const index = require('./routes/index')
-const students = require('./routes/students')
-const teachers = require('./routes/teachers')
+const { routers } = require('./routes')
 
+const config = require('./config')
 const mongodbConnect = require('./models')
 
 // connect mongodb 连接数据库
-mongodbConnect()
+mongodbConnect(config.mongo)
 
 // error handler  app错误处理
 onerror(app)
@@ -39,10 +40,20 @@ app.use(rest.restify())
 // logger 日志
 app.use(logs())
 
+// jwt验证 路由是否有 token 权限
+app.use(jwt({
+  secret: config.secret
+}).unless({
+  path: [/\/login/, /\/register/, /\/public/] // 不需要验证的路由
+}))
+
+// 显示静态文件
+app.use(serve(__dirname, '/public'))
+
 // routes 路由
-app.use(index.routes(), index.allowedMethods())
-app.use(students.routes(), students.allowedMethods())
-app.use(teachers.routes(), teachers.allowedMethods())
+routers.map((routerItem) => {
+  app.use(routerItem.router, routerItem.allowedMethods)
+})
 
 // error-handling 错误处理
 app.on('error', (err, ctx) => {

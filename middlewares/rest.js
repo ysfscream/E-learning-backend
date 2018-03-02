@@ -5,11 +5,16 @@ module.exports = {
       ctx.rest = (status, message, data, meta = {}) => {
         ctx.response.type = 'application/json'
         ctx.response.status = status        
-        ctx.body = { status, message, meta, data }
+        ctx.body = { 
+          status, 
+          message, 
+          meta, 
+          items: data 
+        }
       }
-      try{
+      try {
         await next()
-      } catch(error) {
+      } catch (error) {
         ctx.response.type = 'application/json'        
         ctx.response.status = error.status
         ctx.body = {
@@ -18,5 +23,5 @@ module.exports = {
         }
       }
     }
-  }
+  },
 }

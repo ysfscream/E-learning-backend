@@ -1,10 +1,9 @@
 const mongoose = require('mongoose')
-const { mongo } = require('../config')
 const schema = mongoose.Schema
 
-const mongodbConnect = () => {
-  let mongoURL = 
-    `mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.database}?authSource=${mongo.authdb}`
+const mongodbConnect = (mongo) => {
+  let mongoURL =
+  `mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.database}?authSource=${mongo.authdb}`
 
   mongoose.connect(mongoURL)
 
@@ -22,4 +21,3 @@ const mongodbConnect = () => {
 }
 
 module.exports = mongodbConnect
-

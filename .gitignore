@@ -12,3 +12,10 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+
+public/docs
+public/video
+public/PPT
+public/upload
+
+autogit.sh

@@ -1,10 +1,20 @@
-const router = require('koa-router')()
-var mongoose = require('mongoose')
+const students = require('./students')
+const teachers = require('./teachers')
+const departments = require('./departments')
 
-router.get('/', async (ctx, next) => {
-  await ctx.render('index', {
-    title: '👏 Hello developer!'
-  })
-})
-
-module.exports = router
+module.exports = {
+  routers: [
+    {
+      router: students.routes(),
+      allowedMethods: students.allowedMethods()
+    },
+    {
+      router: teachers.routes(),
+      allowedMethods: teachers.allowedMethods()
+    },
+    {
+      router: departments.routes(),
+      allowedMethods: departments.allowedMethods()
+    }
+  ]
+}
