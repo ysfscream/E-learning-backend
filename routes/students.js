@@ -10,13 +10,50 @@ router.prefix(`${config.apiVersion}/students`)
 
 // 获取全部学生列表
 router.get('/', async (ctx, next) => {
-  const students = await Students.find({})
-  if (students) {
-    ctx.rest(200, '数据获取成功', {
-      students
-    })
+  const page = ctx.query.page
+  const pageSize = ctx.query.pageSize
+  if (!ctx.query.className && !ctx.query.professional) {
+    const students = await Students.find({})
+    if (students) {
+      ctx.rest(200, '数据获取成功', {
+        students
+      })
+    } else {
+      ctx.throw(404, '数据获取失败')
+    }
+  } else if (!ctx.query.professional) {
+    const studentParam = ctx.query
+    const students = await Students.find({ className: studentParam.className })
+    if (students) {
+      ctx.rest(200, '数据获取成功', {
+        students
+      })
+    } else {
+      ctx.throw(404, '数据获取失败')
+    }
+  } else if (!ctx.query.className) {
+    const studentParam = ctx.query
+    const students = await Students.find({ professional: studentParam.professional })
+    if (students) {
+      ctx.rest(200, '数据获取成功', {
+        students
+      })
+    } else {
+      ctx.throw(404, '数据获取失败')
+    }
   } else {
-    ctx.throw(404, '数据获取失败')
+    const studentParam = ctx.query
+    const students = await Students.find({ 
+      className: studentParam.className, 
+      professional: studentParam.professional 
+    })
+    if (students) {
+      ctx.rest(200, '数据获取成功', {
+        students
+      })
+    } else {
+      ctx.throw(404, '数据获取失败')
+    }
   }
 })
 
