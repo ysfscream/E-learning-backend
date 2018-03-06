@@ -20,7 +20,7 @@ router.get('/', async (ctx, next) => {
   }
 })
 
-// 获取学生注册
+// 学生注册
 router.post('/register', async (ctx, next) => {
   let encryptionPassword = await bcrypt.hash(ctx.request.body.password, 10)
   const studentParam = {
@@ -43,6 +43,20 @@ router.post('/register', async (ctx, next) => {
     ctx.rest(201, '注册成功')
   } else {
     ctx.throw(400, '注册失败')
+  }
+})
+
+// 批量导入学生
+router.post('/importStudents', async (ctx, next) => {
+  const studentsParams = ctx.request.body
+  for (let i = 0; i < studentsParams.length; i += 1) {
+    studentsParams[i].password = await bcrypt.hash(studentsParams[i].password, 10)    
+    const importSuccess = await Students.insertMany(studentsParams[i])
+    if (importSuccess.length) {
+      ctx.rest(201, '导入成功')
+    } else {
+      ctx.throw(400, `导入失败`)
+    }
   }
 })
 
