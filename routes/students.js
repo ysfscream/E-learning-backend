@@ -10,46 +10,70 @@ router.prefix(`${config.apiVersion}/students`)
 
 // 获取全部学生列表
 router.get('/', async (ctx, next) => {
-  const page = ctx.query.page
-  const pageSize = ctx.query.pageSize
+  const page = parseInt(ctx.query.page)
+  const pageSize = parseInt(ctx.query.pageSize)
+  const skip = (page - 1) * pageSize
   if (!ctx.query.className && !ctx.query.professional) {
-    const students = await Students.find({})
+    const total = await Students.find({})
+    const count = total.length
+    const students = await Students.find({}).skip(skip).limit(pageSize)
     if (students) {
       ctx.rest(200, '数据获取成功', {
         students
+      }, {
+        count
       })
     } else {
       ctx.throw(404, '数据获取失败')
     }
-  } else if (!ctx.query.professional) {
+  } else if (ctx.query.professional === 'undefined') {
     const studentParam = ctx.query
-    const students = await Students.find({ className: studentParam.className })
+    const total = await Students.find({ className: studentParam.className })
+    const count = total.length
+    const students = await Students.find({ 
+      className: studentParam.className 
+    }).skip(skip).limit(pageSize)
     if (students) {
       ctx.rest(200, '数据获取成功', {
         students
+      }, {
+        count
       })
     } else {
       ctx.throw(404, '数据获取失败')
     }
-  } else if (!ctx.query.className) {
+  } else if (ctx.query.className === 'undefined') {
     const studentParam = ctx.query
-    const students = await Students.find({ professional: studentParam.professional })
+    const total = await Students.find({ professional: studentParam.professional })
+    const count = total.length
+    const students = await Students.find({ 
+      professional: studentParam.professional 
+    }).skip(skip).limit(pageSize)
     if (students) {
       ctx.rest(200, '数据获取成功', {
         students
+      }, {
+        count
       })
     } else {
       ctx.throw(404, '数据获取失败')
     }
   } else {
     const studentParam = ctx.query
+    const total = await Students.find({
+      className: studentParam.className,
+      professional: studentParam.professional
+    })
+    const count = total.length
     const students = await Students.find({ 
       className: studentParam.className, 
       professional: studentParam.professional 
-    })
+    }).skip(skip).limit(pageSize)
     if (students) {
       ctx.rest(200, '数据获取成功', {
         students
+      }, {
+        count
       })
     } else {
       ctx.throw(404, '数据获取失败')
