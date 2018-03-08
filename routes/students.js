@@ -123,7 +123,15 @@ router.post('/importStudents', async (ctx, next) => {
 
 // 获取单个学生信息
 router.get('/:id', async (ctx, next) => {
-  ctx.body = 'this is a students/bar response'
+  const id = ctx.params.id
+  const student = await Students.findOne({ studentID: id })
+  if (student) {
+    ctx.rest(200, '数据获取成功', {
+      student
+    })
+  } else {
+    ctx.throw(404, '数据获取失败')
+  }
 })
 
 // 删除单个学生列表
@@ -147,6 +155,36 @@ router.delete('/deleteAll', async (ctx, next) => {
     } else {
       ctx.throw(400, `删除${ids[i]}失败`)
     }
+  }
+})
+
+// 重置学生密码
+router.put('/resetPassword/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const studentForm = ctx.request.body
+  let encryptionPassword = await bcrypt.hash(ctx.request.body.password, 10)  
+  studentForm.password = encryptionPassword
+  const editStudent = await Students.update({ studentID: id }, {
+    $set: studentForm
+  })
+  if (editStudent.n) {
+    ctx.rest(201, '重置成功')
+  } else {
+    ctx.throw(400, '重置失败')
+  }
+})
+
+// 修改学生信息
+router.put('/info/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const studentForm = ctx.request.body
+  const editStudent = await Students.update({ studentID: id }, {
+    $set: studentForm
+  })
+  if (editStudent.n) {
+    ctx.rest(201, '修改成功')
+  } else {
+    ctx.throw(400, '修改失败')
   }
 })
 
