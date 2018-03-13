@@ -13,7 +13,7 @@ const teacherSchema = new Schema({
   address: { type: String, default: '' },
   description: { type: String, default: ''},
   department: { type: String, default: '' },
-  video: { type: Array, default: [] },
+  videos: { type: Array, default: [] },
   docs: { type: Array, default: [] },
   coursePPT: { type: Array, default: [] },
   share: { type: Array, default: [] },

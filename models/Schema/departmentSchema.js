@@ -6,7 +6,8 @@ const departmentSchema = new Schema({
   _id: ObjectId,
   departments: { type: Array },
   professional: { type: Array },
-  classes: { type: Array }
+  classes: { type: Array },
+  tags: { type: Array }
 })
 
 module.exports = mongoose.model('Departments', departmentSchema)

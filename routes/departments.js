@@ -33,4 +33,13 @@ router.get('/classes', async (ctx, next) => {
   }
 })
 
+router.get('/tags', async (ctx, next) => {
+  const departments = await Departments.find({})
+  if (departments) {
+    ctx.rest(200, 'find success', departments[0].tags)
+  } else {
+    ctx.throw(404, 'find fail')
+  }
+})
+
 module.exports = router
