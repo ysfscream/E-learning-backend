@@ -105,6 +105,9 @@ router.delete('/deleteShare/:id', async (ctx, next) => {
 
 // 获取视频
 router.get('/getVideos/:id', async (ctx, next) => {
+  const page = ctx.query.page
+  const pageSize = ctx.query.pageSize
+  console.log(page, pageSize)
   const id = ctx.params.id
   const teacher = await Teachers.findOne({ _id: id })
 
