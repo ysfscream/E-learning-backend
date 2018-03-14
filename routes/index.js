@@ -2,7 +2,8 @@ const students = require('./students')
 const teachers = require('./teachers')
 const departments = require('./departments')
 const materials = require('./materials')
-const uploadFile = require('./uploadFile')
+const uploadImage = require('./uploadImage')
+const uploadVideo = require('./uploadVideo')
 
 module.exports = {
   routers: [
@@ -23,8 +24,12 @@ module.exports = {
       allowedMethods: materials.allowedMethods()
     },
     {
-      router: uploadFile.routes(),
-      allowedMethods: uploadFile.allowedMethods()
+      router: uploadImage.routes(),
+      allowedMethods: uploadImage.allowedMethods()
+    },
+    {
+      router: uploadVideo.routes(),
+      allowedMethods: uploadVideo.allowedMethods()
     }
   ]
 }

@@ -16,6 +16,6 @@ yarn-error.log*
 public/docs
 public/video
 public/PPT
-public/upload
+public/uploads
 
 autogit.sh

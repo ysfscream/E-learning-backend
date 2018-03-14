@@ -10,7 +10,7 @@ router.get('/getShare/:id', async (ctx, next) => {
   const id = ctx.params.id
   const teacher = await Teachers.findOne({ _id: id })
   if (teacher) {
-    ctx.rest(200, '获取成功', teacher.share)
+    ctx.rest(200, '获取成功', teacher.share.reverse())
   } else {
     ctx.throw(404, '获取失败')
   }
@@ -103,13 +103,88 @@ router.delete('/deleteShare/:id', async (ctx, next) => {
   }
 })
 
+// 获取视频
 router.get('/getVideos/:id', async (ctx, next) => {
   const id = ctx.params.id
   const teacher = await Teachers.findOne({ _id: id })
+
   if (teacher) {
-    ctx.rest(200, '获取成功', teacher.videos)
+    ctx.rest(200, '获取成功', teacher.videos.reverse())
   } else {
     ctx.throw(404, '获取失败')
+  }
+})
+
+// 添加视频
+router.put('/uploadVideo/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const videoList = []
+  const videoParams = ctx.request.body
+  const host = ctx.request.host
+ 
+  // 修改视频地址
+  videoParams.video = `http://${host}/public/uploads/video/${videoParams.video}`
+
+  const teacher = await Teachers.findOne({ _id: id })
+  if (teacher.videos.length === 0) {
+    const videoId = 1
+    videoList.push({
+      videoId,
+      ...videoParams,
+    })
+    const uploadSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        videos: videoList,
+      }
+    })
+    if (uploadSuccess.n) {
+      ctx.rest(201, '上传成功')
+    } else {
+      ctx.throw(400, '上传失败')
+    }
+  } else {
+    const videoId = teacher.videos[teacher.videos.length - 1].videoId + 1
+    teacher.videos.map((video) => {
+      if (video.title === videoParams.title) {
+        ctx.throw(422, '视频名称重复')
+      }
+    })
+    teacher.videos.push({
+      videoId,
+      ...videoParams,
+    })
+    const uploadSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        videos: teacher.videos,
+      }
+    })
+    if (uploadSuccess.n) {
+      ctx.rest(201, '上传成功')
+    } else {
+      ctx.throw(400, '上传失败')
+    }
+  }
+})
+
+// 删除视频
+router.delete('/deleteVideo/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const videoId = parseInt(ctx.query.videoId)
+  const teacher = await Teachers.findOne({ _id: id })
+  if (teacher) {
+    const currentVideo = teacher.videos.filter(item => item.videoId === videoId)
+    if (currentVideo.length) {
+      const deleteVideo = await Teachers.update({ _id: id }, {
+        $pullAll: {
+          videos: currentVideo
+        }
+      })
+      if (deleteVideo.n) {
+        ctx.rest(201, '删除成功')
+      } else {
+        ctx.throw(400, '删除失败')
+      }
+    }
   }
 })
 
