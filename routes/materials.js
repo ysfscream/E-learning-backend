@@ -1,5 +1,6 @@
 const router = require('koa-router')()
 const Teachers = require('../models/Schema/teacherSchema')
+const pageNation = require('../middlewares/pagenation.js')
 
 const config = require('../config')
 
@@ -22,7 +23,7 @@ router.put('/createShare/:id', async (ctx, next) => {
   const shareList = []
   const shareParams = ctx.request.body
   const teacher = await Teachers.findOne({ _id: id })
-  if (teacher.share.length === 0) {
+  if (!teacher.share.length) {
     const shareId = 1
     shareList.push({
       shareId,
@@ -105,14 +106,19 @@ router.delete('/deleteShare/:id', async (ctx, next) => {
 
 // 获取视频
 router.get('/getVideos/:id', async (ctx, next) => {
-  const page = ctx.query.page
-  const pageSize = ctx.query.pageSize
-  console.log(page, pageSize)
+  const page = parseInt(ctx.query.page)
+  const pageSize = parseInt(ctx.query.pageSize)
+  
   const id = ctx.params.id
   const teacher = await Teachers.findOne({ _id: id })
+  const videosList = teacher.videos.reverse()
+  const count = videosList.length
+  const videos = pageNation(page, pageSize, videosList)
 
   if (teacher) {
-    ctx.rest(200, '获取成功', teacher.videos.reverse())
+    ctx.rest(200, '获取成功', videos, {
+      count
+    })
   } else {
     ctx.throw(404, '获取失败')
   }
@@ -129,7 +135,7 @@ router.put('/uploadVideo/:id', async (ctx, next) => {
   videoParams.video = `http://${host}/public/uploads/video/${videoParams.video}`
 
   const teacher = await Teachers.findOne({ _id: id })
-  if (teacher.videos.length === 0) {
+  if (!teacher.videos.length) {
     const videoId = 1
     videoList.push({
       videoId,
