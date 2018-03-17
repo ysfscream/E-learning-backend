@@ -9,36 +9,36 @@ router.prefix(`${config.apiVersion}/departments`)
 router.get('/departments', async (ctx, next) => {
   const departments = await Departments.find({})
   if (departments) {
-    ctx.rest(200, 'find success', departments[0].departments)
+    ctx.rest(200, '查找成功', departments[0].departments)
   } else {
-    ctx.throw(404, 'find fail')
+    ctx.throw(404, '查找失败')
   }
 })
 
 router.get('/professional', async (ctx, next) => {
   const departments = await Departments.find({})
   if (departments) {
-    ctx.rest(200, 'find success', departments[0].professional)
+    ctx.rest(200, '查找成功', departments[0].professional)
   } else {
-    ctx.throw(404, 'find fail')
+    ctx.throw(404, '查找失败')
   }
 })
 
 router.get('/classes', async (ctx, next) => {
   const departments = await Departments.find({})
   if (departments) {
-    ctx.rest(200, 'find success', departments[0].classes)
+    ctx.rest(200, '查找成功', departments[0].classes)
   } else {
-    ctx.throw(404, 'find fail')
+    ctx.throw(404, '查找失败')
   }
 })
 
 router.get('/tags', async (ctx, next) => {
   const departments = await Departments.find({})
   if (departments) {
-    ctx.rest(200, 'find success', departments[0].tags)
+    ctx.rest(200, '查找成功', departments[0].tags)
   } else {
-    ctx.throw(404, 'find fail')
+    ctx.throw(404, '查找失败')
   }
 })
 

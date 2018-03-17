@@ -46,8 +46,8 @@ router.get('/', async (ctx, next) => {
     const studentParam = ctx.query
     const total = await Students.find({ professional: studentParam.professional })
     const count = total.length
-    const students = await Students.find({ 
-      professional: studentParam.professional 
+    const students = await Students.find({
+      professional: studentParam.professional
     }).skip(skip).limit(pageSize)
     if (students) {
       ctx.rest(200, '数据获取成功', {
@@ -65,9 +65,9 @@ router.get('/', async (ctx, next) => {
       professional: studentParam.professional
     })
     const count = total.length
-    const students = await Students.find({ 
-      className: studentParam.className, 
-      professional: studentParam.professional 
+    const students = await Students.find({
+      className: studentParam.className,
+      professional: studentParam.professional
     }).skip(skip).limit(pageSize)
     if (students) {
       ctx.rest(200, '数据获取成功', {
@@ -111,7 +111,7 @@ router.post('/register', async (ctx, next) => {
 router.post('/importStudents', async (ctx, next) => {
   const studentsParams = ctx.request.body
   for (let i = 0; i < studentsParams.length; i += 1) {
-    studentsParams[i].password = await bcrypt.hash(studentsParams[i].password, 10)    
+    studentsParams[i].password = await bcrypt.hash(studentsParams[i].password, 10)
     const importSuccess = await Students.insertMany(studentsParams[i])
     if (importSuccess.length) {
       ctx.rest(201, '导入成功')
@@ -162,7 +162,7 @@ router.delete('/deleteAll', async (ctx, next) => {
 router.put('/resetPassword/:id', async (ctx, next) => {
   const id = ctx.params.id
   const studentForm = ctx.request.body
-  let encryptionPassword = await bcrypt.hash(ctx.request.body.password, 10)  
+  let encryptionPassword = await bcrypt.hash(ctx.request.body.password, 10)
   studentForm.password = encryptionPassword
   const editStudent = await Students.update({ studentID: id }, {
     $set: studentForm
