@@ -108,14 +108,14 @@ router.delete('/deleteShare/:id', async (ctx, next) => {
 router.get('/getVideos/:id', async (ctx, next) => {
   const page = parseInt(ctx.query.page)
   const pageSize = parseInt(ctx.query.pageSize)
-  
+
   const id = ctx.params.id
   const teacher = await Teachers.findOne({ _id: id })
   const videosList = teacher.videos.reverse()
   const count = videosList.length
   const videos = pageNation(page, pageSize, videosList)
 
-  if (teacher) {
+  if (videos) {
     ctx.rest(200, '获取成功', videos, {
       count
     })
@@ -130,7 +130,7 @@ router.put('/uploadVideo/:id', async (ctx, next) => {
   const videoList = []
   const videoParams = ctx.request.body
   const host = ctx.request.host
- 
+
   // 修改视频地址
   videoParams.video = `http://${host}/public/uploads/video/${videoParams.video}`
 
@@ -172,6 +172,26 @@ router.put('/uploadVideo/:id', async (ctx, next) => {
     } else {
       ctx.throw(400, '上传失败')
     }
+  }
+})
+
+// 分类搜索
+router.get('/searchVideo/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const page = parseInt(ctx.query.page)
+  const pageSize = parseInt(ctx.query.pageSize)
+  const tag = ctx.query.tag
+  const teacher = await Teachers.findOne({ _id: id })
+  const videosList = teacher.videos.reverse()
+  if (videosList) {
+    const videos = videosList.filter((video) => {
+      return video.tag === tag 
+    })
+    if (videos) {
+      ctx.rest(200, '获取成功', videos)
+    }
+  } else {
+    ctx.throw(404, '获取失败')
   }
 })
 
