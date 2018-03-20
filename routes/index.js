@@ -4,6 +4,7 @@ const departments = require('./departments')
 const materials = require('./materials')
 const uploadImage = require('./uploadImage')
 const uploadVideo = require('./uploadVideo')
+const statistics = require('./statistics')
 
 module.exports = {
   routers: [
@@ -30,6 +31,10 @@ module.exports = {
     {
       router: uploadVideo.routes(),
       allowedMethods: uploadVideo.allowedMethods()
+    },
+    {
+      router: statistics.routes(),
+      allowedMethods: statistics.allowedMethods()
     }
   ]
 }
