@@ -80,4 +80,37 @@ router.get('/videosCount/:id', async (ctx, next) => {
   }
 })
 
+// 获取全部文档统计
+router.get('/docsCount/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const teacher = await Teachers.findOne({ _id: id })
+
+  const docs = teacher.docs
+  const count = docs.length
+
+  const departments = await Departments.find({})
+  const tags = departments[0].tags
+  const len = tags.length
+
+  const docsData = []
+  const docsName = []
+
+  for (let i = 0; i < len; i++) {
+    let docsLen = docs.filter((doc) => doc.tag === tags[i])
+    docsData.push(docsLen.length)
+    docsName.push(tags[i])
+  }
+
+  if (teacher && departments) {
+    ctx.rest(200, '数据获取成功', {
+      docsData,
+      docsName
+    }, {
+        count
+      })
+  } else {
+    ctx.throw(404, '数据获取失败')
+  }
+})
+
 module.exports = router

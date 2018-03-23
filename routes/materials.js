@@ -178,8 +178,6 @@ router.put('/uploadVideo/:id', async (ctx, next) => {
 // 分类搜索
 router.get('/searchVideo/:id', async (ctx, next) => {
   const id = ctx.params.id
-  const page = parseInt(ctx.query.page)
-  const pageSize = parseInt(ctx.query.pageSize)
   const tag = ctx.query.tag
   const teacher = await Teachers.findOne({ _id: id })
   const videosList = teacher.videos.reverse()
@@ -214,6 +212,172 @@ router.delete('/deleteVideo/:id', async (ctx, next) => {
         ctx.throw(400, '删除失败')
       }
     }
+  }
+})
+
+// 获取文档
+router.get('/getDocs/:id', async (ctx, next) => {
+  const page = parseInt(ctx.query.page)
+  const pageSize = parseInt(ctx.query.pageSize)
+
+  const id = ctx.params.id
+  const teacher = await Teachers.findOne({ _id: id })
+  const docsList = teacher.docs.reverse()
+  const count = docsList.length
+  const docs = pageNation(page, pageSize, docsList)
+
+  if (docs) {
+    ctx.rest(200, '获取成功', docs, {
+      count
+    })
+  } else {
+    ctx.throw(404, '获取失败')
+  }
+})
+
+// 获取文档详情
+router.get('/getDocsInfo/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const docsId = parseInt(ctx.query.docsId)
+  const teacher = await Teachers.findOne({ _id: id })
+
+  const docsList = teacher.docs
+  const doc = docsList.filter((doc) => doc.docsId === docsId)[0]
+
+  if (teacher && docsList) {
+    ctx.rest(200, '获取成功', {
+      ...doc
+    })
+  } else {
+    ctx.throw(404, '获取失败')
+  }
+})
+
+// 更新文档
+router.put('/updateDocs/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const docsParams = ctx.request.body
+  const docsId = docsParams.docsId
+
+  const teacher = await Teachers.findOne({ _id: id })
+  
+  if (teacher) {
+    const docsList = teacher.docs
+    const docs = docsList.map((doc) => {
+      if (doc.docsId === docsId) {
+        Object.assign(doc, docsParams)
+      }
+      return doc
+    })
+    const docsSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        docs: docs,
+      }
+    })
+    if (docsSuccess.n) {
+      ctx.rest(201, '更新成功')
+    } else {
+      ctx.throw(404, '更新失败')
+    }
+  } else {
+    ctx.throw(404, '更新失败')
+  }
+})
+
+
+// 添加文档
+router.put('/uploadDocs/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const docsList = []
+  const docsParams = ctx.request.body
+  const host = ctx.request.host
+
+  // 修改视频地址
+  docsParams.doc = `http://${host}/public/uploads/docs/${docsParams.doc}`
+
+  const teacher = await Teachers.findOne({ _id: id })
+  if (!teacher.docs.length) {
+    const docsId = 1
+    docsList.push({
+      docsId,
+      ...docsParams,
+    })
+    const uploadSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        docs: docsList,
+      }
+    })
+    if (uploadSuccess.n) {
+      ctx.rest(201, '上传成功')
+    } else {
+      ctx.throw(400, '上传失败')
+    }
+  } else {
+    const docsId = teacher.docs[teacher.docs.length - 1].docsId + 1
+    teacher.docs.map((video) => {
+      if (video.title === docsParams.title) {
+        ctx.throw(422, '文档名称重复')
+      }
+    })
+    teacher.docs.push({
+      docsId,
+      ...docsParams,
+    })
+    const uploadSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        docs: teacher.docs,
+      }
+    })
+    if (uploadSuccess.n) {
+      ctx.rest(201, '上传成功')
+    } else {
+      ctx.throw(400, '上传失败')
+    }
+  }
+})
+
+// 删除文档
+router.delete('/deleteDocs/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const docsId = parseInt(ctx.query.docsId)
+  const teacher = await Teachers.findOne({ _id: id })
+  if (teacher) {
+    const currentDocs = teacher.docs.filter(item => item.docsId === docsId)
+    if (currentDocs.length) {
+      const deleteDocs = await Teachers.update({ _id: id }, {
+        $pullAll: {
+          docs: currentDocs
+        }
+      })
+      if (deleteDocs.n) {
+        ctx.rest(201, '删除成功')
+      } else {
+        ctx.throw(400, '删除失败')
+      }
+    }
+  }
+})
+
+// 分类搜索文档
+router.get('/searchDocs/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const page = parseInt(ctx.query.page)
+  const pageSize = parseInt(ctx.query.pageSize)
+  const tag = ctx.query.tag
+  const teacher = await Teachers.findOne({ _id: id })
+  const docsList = teacher.docs.reverse()
+  if (docsList) {
+    const docs = docsList.filter((doc) => {
+      return doc.tag === tag
+    })
+    const count = docs.length
+    if (docs) {
+      ctx.rest(200, '获取成功', docs, {
+        count
+      })
+    }
+  } else {
+    ctx.throw(404, '获取失败')
   }
 })
 
