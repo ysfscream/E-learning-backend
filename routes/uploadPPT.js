@@ -9,7 +9,7 @@ router.prefix(`${config.apiVersion}/upload`)
 let storage = multer.diskStorage({
   //文件保存路径
   destination(req, file, cb) {
-    cb(null, 'public/uploads/video')
+    cb(null, 'public/uploads/ppt')
   },
   //修改文件名称
   filename(req, file, cb) {
@@ -22,7 +22,7 @@ let storage = multer.diskStorage({
 let upload = multer({ storage: storage });
 
 //路由
-router.post('/video', upload.single('video'), async (ctx, next) => {
+router.post('/ppt', upload.single('ppt'), async (ctx, next) => {
   ctx.body = {
     filename: ctx.req.file.filename//返回文件名
   }
