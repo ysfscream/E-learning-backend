@@ -1,5 +1,6 @@
 const router = require('koa-router')()
 const Students = require('../models/Schema/studentSchema')
+const Departments = require('../models/Schema/departmentSchema')
 const bcrypt = require('bcrypt')
 // const jsonwebtoken = require('jsonwebtoken')
 
@@ -30,8 +31,8 @@ router.get('/', async (ctx, next) => {
     const studentParam = ctx.query
     const total = await Students.find({ className: studentParam.className })
     const count = total.length
-    const students = await Students.find({ 
-      className: studentParam.className 
+    const students = await Students.find({
+      className: studentParam.className
     }).skip(skip).limit(pageSize)
     if (students) {
       ctx.rest(200, '数据获取成功', {
@@ -110,14 +111,35 @@ router.post('/register', async (ctx, next) => {
 // 批量导入学生
 router.post('/importStudents', async (ctx, next) => {
   const studentsParams = ctx.request.body
+  const classNameList = []
   for (let i = 0; i < studentsParams.length; i += 1) {
     studentsParams[i].password = await bcrypt.hash(studentsParams[i].password, 10)
+    classNameList.push(studentsParams[i].className)
     const importSuccess = await Students.insertMany(studentsParams[i])
     if (importSuccess.length) {
       ctx.rest(201, '导入成功')
     } else {
       ctx.throw(400, `导入失败`)
     }
+  }
+
+  // 导入学生列表中的班级，去重后添加到数据库
+  const departments = await Departments.find({})
+  let classes = departments[0].classes
+  let className = [...classes, ...classNameList]
+  const unique = (arr) => [...new Set(arr)] // 去重函数
+  classes = unique(className)
+  const addSccuess = await Departments.update({
+    _id: departments[0]._id
+  }, {
+    $set: {
+      classes,
+    }
+  })
+  if (addSccuess.n) {
+    console.log('班级导入成功')
+  } else  {
+    console.log('班级导入失败')
   }
 })
 
