@@ -44,7 +44,7 @@ app.use(logs())
 app.use(jwt({
   secret: config.secret
 }).unless({
-  path: [/\/login/, /\/register/, /\/upload/, /\/public/] // 不需要验证的路由
+  path: [/\/login/, /\/register/, /\/upload/, /\/public/, /\/slideshow/] // 不需要验证的路由
 }))
 
 // 显示静态文件

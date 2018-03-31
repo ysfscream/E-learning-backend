@@ -1,5 +1,5 @@
 const router = require('koa-router')()
-const config = require('../config')
+const config = require('../../config')
 
 const multer = require('koa-multer') //文件上传
 
@@ -9,7 +9,7 @@ router.prefix(`${config.apiVersion}/upload`)
 let storage = multer.diskStorage({
   //文件保存路径
   destination(req, file, cb) {
-    cb(null, 'public/uploads/video')
+    cb(null, 'public/uploads/docs')
   },
   //修改文件名称
   filename(req, file, cb) {
@@ -22,7 +22,7 @@ let storage = multer.diskStorage({
 let upload = multer({ storage: storage });
 
 //路由
-router.post('/video', upload.single('video'), async (ctx, next) => {
+router.post('/docs', upload.single('docs'), async (ctx, next) => {
   ctx.body = {
     filename: ctx.req.file.filename//返回文件名
   }

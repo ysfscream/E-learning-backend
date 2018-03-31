@@ -1,8 +1,8 @@
 const router = require('koa-router')()
-const Teachers = require('../models/Schema/teacherSchema')
-const pageNation = require('../middlewares/pagenation.js')
+const Teachers = require('../../models/Schema/teacherSchema')
+const pageNation = require('../../middlewares/pagenation.js')
 
-const config = require('../config')
+const config = require('../../config')
 
 router.prefix(`${config.apiVersion}/meterials`)
 

@@ -1,10 +1,10 @@
 const router = require('koa-router')()
-const Students = require('../models/Schema/studentSchema')
-const Departments = require('../models/Schema/departmentSchema')
+const Students = require('../../models/Schema/studentSchema')
+const Departments = require('../../models/Schema/departmentSchema')
 const bcrypt = require('bcrypt')
 // const jsonwebtoken = require('jsonwebtoken')
 
-const config = require('../config')
+const config = require('../../config')
 
 // 路由前缀 prefix
 router.prefix(`${config.apiVersion}/students`)
