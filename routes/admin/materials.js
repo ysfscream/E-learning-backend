@@ -6,23 +6,15 @@ const config = require('../../config')
 
 router.prefix(`${config.apiVersion}/meterials`)
 
-//获取分享
-router.get('/getShare/:id', async (ctx, next) => {
-  const id = ctx.params.id
-  const teacher = await Teachers.findOne({ _id: id })
-  if (teacher) {
-    ctx.rest(200, '获取成功', teacher.share.reverse())
-  } else {
-    ctx.throw(404, '获取失败')
-  }
-})
-
 // 添加分享
 router.put('/createShare/:id', async (ctx, next) => {
   const id = ctx.params.id
   const shareList = []
   const shareParams = ctx.request.body
   const teacher = await Teachers.findOne({ _id: id })
+
+  shareParams.teacherName = teacher.teacherName
+
   if (!teacher.share.length) {
     const shareId = 1
     shareList.push({
@@ -63,25 +55,6 @@ router.put('/createShare/:id', async (ctx, next) => {
   }
 })
 
-// 更新分享
-router.put('/updateShare/:id', async (ctx, next) => {
-  const id = ctx.params.id
-  const shareParams = ctx.request.body
-  const teacher = await Teachers.findOne({ _id: id })
-  if (teacher) {
-    const shareSuccess = await Teachers.update({ _id: id }, {
-      $set: {
-        share: shareParams,
-      }
-    })
-    if (shareSuccess.n) {
-      ctx.rest(201, '修改成功')
-    } else {
-      ctx.throw(400, '修改失败')
-    }
-  }
-})
-
 // 删除分享
 router.delete('/deleteShare/:id', async (ctx, next) => {
   const id = ctx.params.id
@@ -104,21 +77,31 @@ router.delete('/deleteShare/:id', async (ctx, next) => {
   }
 })
 
-// 获取视频
-router.get('/getVideos/:id', async (ctx, next) => {
-  const page = parseInt(ctx.query.page)
-  const pageSize = parseInt(ctx.query.pageSize)
+// 更新分享
+router.put('/updateShare/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const shareParams = ctx.request.body
+  const teacher = await Teachers.findOne({ _id: id })
+  if (teacher) {
+    const shareSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        share: shareParams,
+      }
+    })
+    if (shareSuccess.n) {
+      ctx.rest(201, '修改成功')
+    } else {
+      ctx.throw(400, '修改失败')
+    }
+  }
+})
 
+//获取分享
+router.get('/getShare/:id', async (ctx, next) => {
   const id = ctx.params.id
   const teacher = await Teachers.findOne({ _id: id })
-  const videosList = teacher.videos.reverse()
-  const count = videosList.length
-  const videos = pageNation(page, pageSize, videosList)
-
-  if (videos) {
-    ctx.rest(200, '获取成功', videos, {
-      count
-    })
+  if (teacher) {
+    ctx.rest(200, '获取成功', teacher.share.reverse())
   } else {
     ctx.throw(404, '获取失败')
   }
@@ -135,6 +118,10 @@ router.put('/uploadVideo/:id', async (ctx, next) => {
   videoParams.video = `http://${host}/public/uploads/video/${videoParams.video}`
 
   const teacher = await Teachers.findOne({ _id: id })
+  videoParams.teacherName = teacher.teacherName
+  videoParams.likes = 0
+  videoParams.view = 0
+
   if (!teacher.videos.length) {
     const videoId = 1
     videoList.push({
@@ -175,7 +162,50 @@ router.put('/uploadVideo/:id', async (ctx, next) => {
   }
 })
 
-// 分类搜索
+// 删除视频
+router.delete('/deleteVideo/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const videoId = parseInt(ctx.query.videoId)
+  const teacher = await Teachers.findOne({ _id: id })
+  if (teacher) {
+    const currentVideo = teacher.videos.filter(item => item.videoId === videoId)
+    if (currentVideo.length) {
+      const deleteVideo = await Teachers.update({ _id: id }, {
+        $pullAll: {
+          videos: currentVideo
+        }
+      })
+      if (deleteVideo.n) {
+        ctx.rest(201, '删除成功')
+      } else {
+        ctx.throw(400, '删除失败')
+      }
+    }
+  }
+})
+
+// 获取视频
+router.get('/getVideos/:id', async (ctx, next) => {
+  const page = parseInt(ctx.query.page)
+  const pageSize = parseInt(ctx.query.pageSize)
+
+  const id = ctx.params.id
+  const teacher = await Teachers.findOne({ _id: id })
+  const videosList = teacher.videos.reverse()
+  const count = videosList.length
+  const videos = pageNation(page, pageSize, videosList)
+
+  if (videos) {
+    ctx.rest(200, '获取成功', videos, {
+      count
+    })
+  } else {
+    ctx.throw(404, '获取失败')
+  }
+})
+
+
+// 分类搜索视频
 router.get('/searchVideo/:id', async (ctx, next) => {
   const id = ctx.params.id
   const tag = ctx.query.tag
@@ -191,20 +221,75 @@ router.get('/searchVideo/:id', async (ctx, next) => {
   }
 })
 
-// 删除视频
-router.delete('/deleteVideo/:id', async (ctx, next) => {
+// 添加文档
+router.put('/uploadDocs/:id', async (ctx, next) => {
   const id = ctx.params.id
-  const videoId = parseInt(ctx.query.videoId)
+  const docsList = []
+  const docsParams = ctx.request.body
+  const host = ctx.request.host
+
+  // 修改文档地址
+  docsParams.doc = `http://${host}/public/uploads/docs/${docsParams.doc}`
+  docsParams.likes = 0
+  docsParams.view = 0
+
+  const teacher = await Teachers.findOne({ _id: id })
+  docsParams.teacherName = teacher.teacherName
+
+  if (!teacher.docs.length) {
+    const docsId = 1
+    docsList.push({
+      docsId,
+      ...docsParams,
+    })
+    const uploadSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        docs: docsList,
+      }
+    })
+    if (uploadSuccess.n) {
+      ctx.rest(201, '上传成功')
+    } else {
+      ctx.throw(400, '上传失败')
+    }
+  } else {
+    const docsId = teacher.docs[teacher.docs.length - 1].docsId + 1
+    teacher.docs.map((video) => {
+      if (video.title === docsParams.title) {
+        ctx.throw(422, '文档名称重复')
+      }
+    })
+    teacher.docs.push({
+      docsId,
+      ...docsParams,
+    })
+    const uploadSuccess = await Teachers.update({ _id: id }, {
+      $set: {
+        docs: teacher.docs,
+      }
+    })
+    if (uploadSuccess.n) {
+      ctx.rest(201, '上传成功')
+    } else {
+      ctx.throw(400, '上传失败')
+    }
+  }
+})
+
+// 删除文档
+router.delete('/deleteDocs/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const docsId = parseInt(ctx.query.docsId)
   const teacher = await Teachers.findOne({ _id: id })
   if (teacher) {
-    const currentVideo = teacher.videos.filter(item => item.videoId === videoId)
-    if (currentVideo.length) {
-      const deleteVideo = await Teachers.update({ _id: id }, {
+    const currentDocs = teacher.docs.filter(item => item.docsId === docsId)
+    if (currentDocs.length) {
+      const deleteDocs = await Teachers.update({ _id: id }, {
         $pullAll: {
-          videos: currentVideo
+          docs: currentDocs
         }
       })
-      if (deleteVideo.n) {
+      if (deleteDocs.n) {
         ctx.rest(201, '删除成功')
       } else {
         ctx.throw(400, '删除失败')
@@ -282,79 +367,6 @@ router.put('/updateDocs/:id', async (ctx, next) => {
   }
 })
 
-// 添加文档
-router.put('/uploadDocs/:id', async (ctx, next) => {
-  const id = ctx.params.id
-  const docsList = []
-  const docsParams = ctx.request.body
-  const host = ctx.request.host
-
-  // 修改视频地址
-  docsParams.doc = `http://${host}/public/uploads/docs/${docsParams.doc}`
-
-  const teacher = await Teachers.findOne({ _id: id })
-  if (!teacher.docs.length) {
-    const docsId = 1
-    docsList.push({
-      docsId,
-      ...docsParams,
-    })
-    const uploadSuccess = await Teachers.update({ _id: id }, {
-      $set: {
-        docs: docsList,
-      }
-    })
-    if (uploadSuccess.n) {
-      ctx.rest(201, '上传成功')
-    } else {
-      ctx.throw(400, '上传失败')
-    }
-  } else {
-    const docsId = teacher.docs[teacher.docs.length - 1].docsId + 1
-    teacher.docs.map((video) => {
-      if (video.title === docsParams.title) {
-        ctx.throw(422, '文档名称重复')
-      }
-    })
-    teacher.docs.push({
-      docsId,
-      ...docsParams,
-    })
-    const uploadSuccess = await Teachers.update({ _id: id }, {
-      $set: {
-        docs: teacher.docs,
-      }
-    })
-    if (uploadSuccess.n) {
-      ctx.rest(201, '上传成功')
-    } else {
-      ctx.throw(400, '上传失败')
-    }
-  }
-})
-
-// 删除文档
-router.delete('/deleteDocs/:id', async (ctx, next) => {
-  const id = ctx.params.id
-  const docsId = parseInt(ctx.query.docsId)
-  const teacher = await Teachers.findOne({ _id: id })
-  if (teacher) {
-    const currentDocs = teacher.docs.filter(item => item.docsId === docsId)
-    if (currentDocs.length) {
-      const deleteDocs = await Teachers.update({ _id: id }, {
-        $pullAll: {
-          docs: currentDocs
-        }
-      })
-      if (deleteDocs.n) {
-        ctx.rest(201, '删除成功')
-      } else {
-        ctx.throw(400, '删除失败')
-      }
-    }
-  }
-})
-
 // 分类搜索文档
 router.get('/searchDocs/:id', async (ctx, next) => {
   const id = ctx.params.id
@@ -378,26 +390,6 @@ router.get('/searchDocs/:id', async (ctx, next) => {
   }
 })
 
-// 获取ppt
-router.get('/getPPT/:id', async (ctx, next) => {
-  const page = parseInt(ctx.query.page)
-  const pageSize = parseInt(ctx.query.pageSize)
-
-  const id = ctx.params.id
-  const teacher = await Teachers.findOne({ _id: id })
-  const PPTList = teacher.coursePPT
-  const count = PPTList.length
-  const PPTs = pageNation(page, pageSize, PPTList)
-
-  if (PPTs) {
-    ctx.rest(200, '获取成功', PPTs, {
-      count
-    })
-  } else {
-    ctx.throw(404, '获取失败')
-  }
-})
-
 // 添加ppt
 router.put('/uploadPPT/:id', async (ctx, next) => {
   const id = ctx.params.id
@@ -407,8 +399,12 @@ router.put('/uploadPPT/:id', async (ctx, next) => {
 
   // 修改ppt地址
   PPTParams.ppt = `http://${host}/public/uploads/ppt/${PPTParams.ppt}`
+  PPTParams.likes = 0
+  PPTParams.view = 0
 
   const teacher = await Teachers.findOne({ _id: id })
+  PPTParams.teacherName = teacher.teacherName
+
   if (!teacher.coursePPT.length) {
     const pptId = 1
     PPTList.push({
@@ -471,24 +467,6 @@ router.delete('/deletePPT/:id', async (ctx, next) => {
   }
 })
 
-// 获取ppt详情
-router.get('/getPPTInfo/:id', async (ctx, next) => {
-  const id = ctx.params.id
-  const pptId = parseInt(ctx.query.pptId)
-  const teacher = await Teachers.findOne({ _id: id })
-
-  const PPTList = teacher.coursePPT
-  const ppt = PPTList.filter((ppt) => ppt.pptId === pptId)[0]
-
-  if (teacher && PPTList) {
-    ctx.rest(200, '获取成功', {
-      ...ppt
-    })
-  } else {
-    ctx.throw(404, '获取失败')
-  }
-})
-
 // 更新ppt
 router.put('/updatePPT/:id', async (ctx, next) => {
   const id = ctx.params.id
@@ -517,6 +495,44 @@ router.put('/updatePPT/:id', async (ctx, next) => {
     }
   } else {
     ctx.throw(404, '更新失败')
+  }
+})
+
+// 获取ppt
+router.get('/getPPT/:id', async (ctx, next) => {
+  const page = parseInt(ctx.query.page)
+  const pageSize = parseInt(ctx.query.pageSize)
+
+  const id = ctx.params.id
+  const teacher = await Teachers.findOne({ _id: id })
+  const PPTList = teacher.coursePPT
+  const count = PPTList.length
+  const PPTs = pageNation(page, pageSize, PPTList)
+
+  if (PPTs) {
+    ctx.rest(200, '获取成功', PPTs, {
+      count
+    })
+  } else {
+    ctx.throw(404, '获取失败')
+  }
+})
+
+// 获取ppt详情
+router.get('/getPPTInfo/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const pptId = parseInt(ctx.query.pptId)
+  const teacher = await Teachers.findOne({ _id: id })
+
+  const PPTList = teacher.coursePPT
+  const ppt = PPTList.filter((ppt) => ppt.pptId === pptId)[0]
+
+  if (teacher && PPTList) {
+    ctx.rest(200, '获取成功', {
+      ...ppt
+    })
+  } else {
+    ctx.throw(404, '获取失败')
   }
 })
 
