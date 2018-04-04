@@ -2,7 +2,7 @@ const router = require('koa-router')()
 const Students = require('../../models/Schema/studentSchema')
 const Departments = require('../../models/Schema/departmentSchema')
 const bcrypt = require('bcrypt')
-// const jsonwebtoken = require('jsonwebtoken')
+const jsonwebtoken = require('jsonwebtoken')
 
 const config = require('../../config')
 
@@ -79,6 +79,41 @@ router.get('/', async (ctx, next) => {
     } else {
       ctx.throw(404, '数据获取失败')
     }
+  }
+})
+
+// 学生登录
+router.post('/login', async (ctx, next) => {
+  const studentParam = {
+    studentID: ctx.request.body.studentID,
+    password: ctx.request.body.password
+  }
+  const loginInfo = await Students.findOne({
+    studentID: studentParam.studentID
+  })
+  if (loginInfo) {
+    if (await bcrypt.compare(studentParam.password, loginInfo.password)) {
+      const studentData = {
+        id: loginInfo._id,
+        role: loginInfo.role,
+        studentName: loginInfo.studentName,
+        headImg: loginInfo.headImg,
+      }
+      const student = {
+        ...studentData,
+        token: jsonwebtoken.sign({
+          data: {
+            ...studentData,
+          },
+          exp: Math.floor(Date.now() / 10000) + (60 * 60 * 24),
+        }, config.secret),
+      }
+      ctx.rest(200, '登录成功', student)
+    } else {
+      ctx.throw(404, '登录失败，密码错误')
+    }
+  } else {
+    ctx.throw(404, '登录失败，学号错误')
   }
 })
 
