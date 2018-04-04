@@ -46,6 +46,7 @@ app.use(jwt({
 }).unless({
   path: [
     /\/login/,
+    /\/logout/,
     /\/register/,
     /\/upload/,
     /\/public/,

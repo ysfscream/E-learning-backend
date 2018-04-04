@@ -99,6 +99,18 @@ router.post('/login', async (ctx, next) => {
         studentName: loginInfo.studentName,
         headImg: loginInfo.headImg,
       }
+      const loginSuccess = await Students.updateOne({
+        studentID: studentParam.studentID
+      }, {
+        $set: {
+          isLogin: true,
+        }
+      })
+      if (loginSuccess.n) {
+        console.log('登录成功')
+      } else {
+        console.log('登录失败')
+      }
       const student = {
         ...studentData,
         token: jsonwebtoken.sign({
@@ -114,6 +126,23 @@ router.post('/login', async (ctx, next) => {
     }
   } else {
     ctx.throw(404, '登录失败，学号错误')
+  }
+})
+
+// 学生退出登录
+router.put('/logout', async (ctx, next) => {
+  const id = ctx.request.body.id
+  const editStudent = await Students.update({ _id: id }, {
+    $set: {
+      isLogin: false,
+    }
+  })
+  if (editStudent.n) {
+    console.log('退出成功')    
+    ctx.rest(201, '退成成功')
+  } else {
+    console.log('退出失败')        
+    ctx.throw(400, '退出失败')
   }
 })
 
