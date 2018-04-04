@@ -1,12 +1,13 @@
-const students = require('./students')
-const teachers = require('./teachers')
-const departments = require('./departments')
-const materials = require('./materials')
-const statistics = require('./statistics')
-const uploadImage = require('./uploadImage')
-const uploadVideo = require('./uploadVideo')
-const uploadDocs = require('./uploadDocs')
-const uploadPPT = require('./uploadPPT')
+const students = require('./admin/students')
+const teachers = require('./admin/teachers')
+const departments = require('./admin/departments')
+const materials = require('./admin/materials')
+const statistics = require('./admin/statistics')
+const uploadImage = require('./admin/uploadImage')
+const uploadVideo = require('./admin/uploadVideo')
+const uploadDocs = require('./admin/uploadDocs')
+const uploadPPT = require('./admin/uploadPPT')
+const home = require('./student/home')
 
 module.exports = {
   routers: [
@@ -45,6 +46,10 @@ module.exports = {
     {
       router: statistics.routes(),
       allowedMethods: statistics.allowedMethods()
+    },
+    {
+      router: home.routes(),
+      allowedMethods: home.allowedMethods()
     }
   ]
 }

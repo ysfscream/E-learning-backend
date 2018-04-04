@@ -1,9 +1,9 @@
 const router = require('koa-router')()
-const Teachers = require('../models/Schema/teacherSchema')
-const Students = require('../models/Schema/studentSchema')
-const Departments = require('../models/Schema/departmentSchema')
+const Teachers = require('../../models/Schema/teacherSchema')
+const Students = require('../../models/Schema/studentSchema')
+const Departments = require('../../models/Schema/departmentSchema')
 
-const config = require('../config')
+const config = require('../../config')
 
 // 路由前缀 prefix
 router.prefix(`${config.apiVersion}/statistics`)
