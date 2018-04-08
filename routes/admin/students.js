@@ -138,10 +138,10 @@ router.put('/logout', async (ctx, next) => {
     }
   })
   if (editStudent.n) {
-    console.log('退出成功')    
+    console.log('退出成功')
     ctx.rest(201, '退成成功')
   } else {
-    console.log('退出失败')        
+    console.log('退出失败')
     ctx.throw(400, '退出失败')
   }
 })

@@ -53,8 +53,10 @@ app.use(jwt({
     /\/getSlideshow/,
     /\/professions/,
     /\/tags/,
-    /\/getRecommend/
-  ] 
+    /\/getRecommend/,
+    /\/getDocs/,
+    /\/getVideos/
+  ]
   // 不需要验证的路由
 }))
 
