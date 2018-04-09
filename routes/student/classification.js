@@ -113,4 +113,32 @@ router.get('/getShares', async (ctx, next) => {
   }
 })
 
+// 获取标签分类
+router.get('/getTags/:tag', async (ctx, next) => {
+  const tag = ctx.params.tag
+  console.log(tag)
+  const teacherList = await Teachers.find({})
+  const videoList = []
+  const docsList = []
+  const PPTList = []
+  teacherList.forEach((teacher) => {
+    videoList.push(...teacher.videos)
+    docsList.push(...teacher.docs)
+    PPTList.push(...teacher.coursePPT)
+  })
+  let videos = videoList.filter((video) => video.tag === tag)
+  let docs = docsList.filter((doc) => doc.tag === tag)
+  let PPTs = PPTList.filter((PPT) => PPT.tag === tag)
+  const tagList = {
+    videos,
+    docs,
+    PPTs,
+  }
+  if (tagList) {
+    ctx.rest(200, '获取成功', { tagList })
+  } else {
+    ctx.throw(404, '获取失败')
+  }
+})
+
 module.exports = router

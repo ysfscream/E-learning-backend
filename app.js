@@ -60,6 +60,7 @@ app.use(jwt({
     /\/getNew/,
     /\/getLikes/,
     /\/getShares/,
+    /\/getTags/,
   ]
   // 不需要验证的路由
 }))
