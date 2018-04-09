@@ -9,6 +9,7 @@ const uploadDocs = require('./admin/uploadDocs')
 const uploadPPT = require('./admin/uploadPPT')
 const home = require('./student/home')
 const getView = require('./student/getView')
+const classification = require('./student/classification')
 
 module.exports = {
   routers: [
@@ -55,6 +56,10 @@ module.exports = {
     {
       router: getView.routes(),
       allowedMethods: getView.allowedMethods()
-    }
+    },
+    {
+      router: classification.routes(),
+      allowedMethods: classification.allowedMethods()
+    },
   ]
 }
