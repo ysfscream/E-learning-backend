@@ -8,6 +8,7 @@ const uploadVideo = require('./admin/uploadVideo')
 const uploadDocs = require('./admin/uploadDocs')
 const uploadPPT = require('./admin/uploadPPT')
 const home = require('./student/home')
+const getView = require('./student/getView')
 
 module.exports = {
   routers: [
@@ -50,6 +51,10 @@ module.exports = {
     {
       router: home.routes(),
       allowedMethods: home.allowedMethods()
+    },
+    {
+      router: getView.routes(),
+      allowedMethods: getView.allowedMethods()
     }
   ]
 }
