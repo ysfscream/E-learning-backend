@@ -55,7 +55,12 @@ app.use(jwt({
     /\/tags/,
     /\/getRecommend/,
     /\/getDocs/,
-    /\/getVideos/
+    /\/getVideos/,
+    /\/getPopular/,
+    /\/getNew/,
+    /\/getLikes/,
+    /\/getShares/,
+    /\/getTags/,
   ]
   // 不需要验证的路由
 }))
