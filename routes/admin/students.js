@@ -260,6 +260,35 @@ router.put('/resetPassword/:id', async (ctx, next) => {
   }
 })
 
+// 修改学生密码
+router.put('/password/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const studentPasswordForm = ctx.request.body
+  console.log(id)
+  const student = await Students.findOne({
+    _id: id
+  })
+  console.log(student)
+  const passwordRight = await bcrypt.compare(studentPasswordForm.oldPassword, student.password)
+  if (passwordRight) {
+    let encryptionPassword = await bcrypt.hash(studentPasswordForm.password, 10)
+    const changePassword = await Students.update({
+      _id: id
+    }, {
+      $set: {
+        password: encryptionPassword,
+      }
+    })
+    if (changePassword.n) {
+      ctx.rest(201, '修改成功')
+    } else {
+      ctx.throw(400, '修改失败')
+    }
+  } else {
+    ctx.rest(404, '旧密码错误')
+  }
+})
+
 // 修改学生信息
 router.put('/info/:id', async (ctx, next) => {
   const id = ctx.params.id
