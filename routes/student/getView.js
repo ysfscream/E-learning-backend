@@ -22,7 +22,7 @@ router.get('/getDocs/:id', async (ctx, next) => {
         restDocs.push(doc)
       }
     })
-    ctx.rest(200, '数据获取成功', {
+   ctx.rest(200, '数据获取成功', {
       currentDoc,
       restDocs,
     })
@@ -66,6 +66,64 @@ router.get('/getVideos/:id', async (ctx, next) => {
         videos: videosList,
       }
     })
+  } else {
+    ctx.throw(404, '数据获取失败')
+  }
+})
+
+// 点赞视频
+router.put('/likesVideo/:id', async (ctx, next) => {
+  const teacherName = ctx.query.teacherName
+  const id = parseInt(ctx.params.id)
+  const teacher = await Teachers.findOne({ teacherName: teacherName })
+  if (teacher) {
+    const videosList = teacher.videos
+    videosList.forEach((video) => {
+      if (video.videoId === id) {
+        video.likes += 1
+      }
+    })
+    const updateSuccess = await Teachers.updateOne({
+      teacherName: teacherName
+    }, {
+      $set: {
+        videos: videosList,
+      }
+    })
+    if (updateSuccess.n) {
+      ctx.rest(201, '喜欢成功', {})
+    } else {
+      ctx.throw(400, '喜欢失败')
+    }
+  } else {
+    ctx.throw(404, '数据获取失败')
+  }
+})
+
+// 点赞文档
+router.put('/likesDoc/:id', async (ctx, next) => {
+  const teacherName = ctx.query.teacherName
+  const id = parseInt(ctx.params.id)
+  const teacher = await Teachers.findOne({ teacherName: teacherName })
+  if (teacher) {
+    const docsList = teacher.docs
+    docsList.forEach((doc) => {
+      if (doc.docsId === id) {
+        doc.likes += 1
+      }
+    })
+    const updateSuccess = await Teachers.updateOne({
+      teacherName: teacherName
+    }, {
+      $set: {
+        docs: docsList,
+      }
+    })
+    if (updateSuccess.n) {
+      ctx.rest(201, '喜欢成功', {})
+    } else {
+      ctx.throw(400, '喜欢失败')
+    }
   } else {
     ctx.throw(404, '数据获取失败')
   }
