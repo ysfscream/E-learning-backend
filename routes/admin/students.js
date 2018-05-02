@@ -95,6 +95,7 @@ router.post('/login', async (ctx, next) => {
     if (await bcrypt.compare(studentParam.password, loginInfo.password)) {
       const studentData = {
         id: loginInfo._id,
+        studentID: loginInfo.studentID,
         role: loginInfo.role,
         studentName: loginInfo.studentName,
         headImg: loginInfo.headImg,
@@ -295,6 +296,26 @@ router.put('/info/:id', async (ctx, next) => {
   const studentForm = ctx.request.body
   const editStudent = await Students.update({ studentID: id }, {
     $set: studentForm
+  })
+  if (editStudent.n) {
+    ctx.rest(201, '修改成功')
+  } else {
+    ctx.throw(400, '修改失败')
+  }
+})
+
+// 修改学生头像
+router.put('/headImg/:id', async (ctx, next) => {
+  const id = ctx.params.id
+  const studentForm = ctx.request.body
+  const host = ctx.request.host
+
+  // 修改图片地址
+  studentForm.headImg = `http://${host}/public/uploads/images/${studentForm.headImg}`
+  const editStudent = await Students.update({ studentID: id }, {
+    $set: {
+      headImg: studentForm.headImg
+    }
   })
   if (editStudent.n) {
     ctx.rest(201, '修改成功')

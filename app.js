@@ -65,6 +65,7 @@ app.use(jwt({
     /\/likesDoc/,
     /\/password/,
     /\/info/,
+    /\/students/,
   ]
   // 不需要验证的路由
 }))

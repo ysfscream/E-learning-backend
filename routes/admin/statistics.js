@@ -12,7 +12,7 @@ router.prefix(`${config.apiVersion}/statistics`)
 router.get('/studentsCount', async (ctx, next) => {
   const student = await Students.find({})
   const departments = await Departments.find({})
- 
+
   const count = student.length
   const isLogin = student.filter((student) => student.isLogin).length
   const isNotLogin = student.filter((student) => !student.isLogin).length
